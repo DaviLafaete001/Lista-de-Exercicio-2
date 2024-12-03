@@ -1,1 +1,82 @@
+#include <stdio.h>
+
+#define MAX_SIZE 50  // Tamanho máximo da lista
+
+// Definição da lista estática
+int lista[MAX_SIZE];
+int tamanho = 0;  // Variável que guarda o número atual de elementos na lista
+
+// Função para inserir um valor na lista de forma crescente
+void inserir_crescente(int x) {
+    // Verifica se a lista já está cheia
+    if (tamanho >= MAX_SIZE) {
+        printf("A lista está cheia!\n");
+        return;
+    }
+
+    // Encontra a posição correta para inserir o valor
+    int i = tamanho - 1;
+    while (i >= 0 && lista[i] > x) {
+        lista[i + 1] = lista[i];
+        i--;
+    }
+
+    // Insere o valor na posição correta
+    lista[i + 1] = x;
+    tamanho++;
+}
+
+// Função para inserir um valor na lista de forma decrescente
+void inserir_decrescente(int x) {
+    // Verifica se a lista já está cheia
+    if (tamanho >= MAX_SIZE) {
+        printf("A lista está cheia!\n");
+        return;
+    }
+
+    // Encontra a posição correta para inserir o valor
+    int i = tamanho - 1;
+    while (i >= 0 && lista[i] < x) {
+        lista[i + 1] = lista[i];
+        i--;
+    }
+
+    // Insere o valor na posição correta
+    lista[i + 1] = x;
+    tamanho++;
+}
+
+// Função para imprimir a lista
+void imprimir_lista() {
+    printf("Lista: ");
+    for (int i = 0; i < tamanho; i++) {
+        printf("%d ", lista[i]);
+    }
+    printf("\n");
+}
+
+// Função principal
+int main() {
+    // Exemplo de inserção em ordem crescente
+    printf("Inserindo em ordem crescente:\n");
+    inserir_crescente(10);
+    inserir_crescente(20);
+    inserir_crescente(5);
+    inserir_crescente(15);
+    inserir_crescente(25);
+
+    imprimir_lista();  // Imprime a lista em ordem crescente
+
+    // Exemplo de inserção em ordem decrescente
+    printf("\nInserindo em ordem decrescente:\n");
+    inserir_decrescente(10);
+    inserir_decrescente(20);
+    inserir_decrescente(5);
+    inserir_decrescente(15);
+    inserir_decrescente(25);
+
+    imprimir_lista();  // Imprime a lista em ordem decrescente
+
+    return 0;
+}
 
