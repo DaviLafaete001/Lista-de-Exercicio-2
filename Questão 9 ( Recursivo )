@@ -1,0 +1,83 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <conio.h>
+#include <string.h>
+typedef struct Node {
+    int data;
+    struct Node* next;
+} Node;
+
+Node* create_node(int data) {
+    Node* new_node = (Node*)malloc(sizeof(Node));
+    if (new_node == NULL) {
+        printf("Erro de alocação de memória!\n");
+        exit(1);
+    }
+    new_node->data = data;
+    new_node->next = NULL;
+    return new_node;
+}
+
+void append(Node** head, int data) {
+    Node* new_node = create_node(data);
+    if (*head == NULL) {
+        *head = new_node;
+    } else {
+        Node* temp = *head;
+        while (temp->next != NULL) {
+            temp = temp->next;
+        }
+        temp->next = new_node;
+    }
+}
+
+int are_equal_iterative(Node* head1, Node* head2) {
+    while (head1 != NULL && head2 != NULL) {
+        if (head1->data != head2->data) {
+            return 0;
+        }
+        head1 = head1->next;
+        head2 = head2->next;
+    }
+    return (head1 == NULL && head2 == NULL);
+}
+
+int are_equal_recursive(Node* head1, Node* head2) {
+    if (head1 == NULL && head2 == NULL) {
+        return 1;
+    }
+    if (head1 == NULL || head2 == NULL) {
+        return 0;
+    }
+    if (head1->data != head2->data) {
+        return 0;
+    }
+    return are_equal_recursive(head1->next, head2->next);
+}
+
+int main() {
+    Node* list1 = NULL;
+    Node* list2 = NULL;
+
+    append(&list1, 1);
+    append(&list1, 2);
+    append(&list1, 3);
+
+    append(&list2, 1);
+    append(&list2, 2);
+    append(&list2, 3);
+
+    if (are_equal_iterative(list1, list2)) {
+        printf("As listas são iguais (iterativo).\n");
+    } else {
+        printf("As listas são diferentes (iterativo).\n");
+    }
+
+    if (are_equal_recursive(list1, list2)) {
+        printf("As listas são iguais (recursivo).\n");
+    } else {
+        printf("As listas são diferentes (recursivo).\n");
+    }
+
+    return 0;
+}
