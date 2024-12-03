@@ -1,0 +1,63 @@
+#include <stdio.h>
+#include <string.h>
+
+#define NUM_PRODUTOS 20
+
+// Definindo a estrutura PROD
+typedef struct {
+    char nome[80];
+    float preco;
+} PROD;
+
+// Função que recebe uma estrutura PROD e atualiza o preço
+void inflacionarPreco(PROD* produto) {
+    if (produto->preco < 100) {
+        produto->preco *= 1.05;  // Aumenta 5% no preço
+    }
+}
+
+// Função que lê os dados de um produto
+void lerProduto(PROD* produto) {
+    printf("Digite o nome do produto: ");
+    fgets(produto->nome, sizeof(produto->nome), stdin);
+    produto->nome[strcspn(produto->nome, "\n")] = '\0';  // Remove o '\n' do final da string
+    printf("Digite o preço do produto: ");
+    scanf("%f", &produto->preco);
+    getchar();  // Consumir o '\n' que fica no buffer
+}
+
+// Função que imprime a lista de produtos
+void imprimirProdutos(PROD produtos[], int numProdutos) {
+    printf("\nLista de Produtos:\n");
+    for (int i = 0; i < numProdutos; i++) {
+        printf("%s - R$ %.2f\n", produtos[i].nome, produtos[i].preco);
+    }
+}
+
+// Função de comparação para a ordenação alfabética (ordem crescente)
+int compararProdutos(const void* a, const void* b) {
+    return strcmp(((PROD*)a)->nome, ((PROD*)b)->nome);
+}
+
+int main() {
+    PROD produtos[NUM_PRODUTOS];
+
+    // Lendo os dados dos 20 produtos
+    for (int i = 0; i < NUM_PRODUTOS; i++) {
+        printf("Produto %d:\n", i + 1);
+        lerProduto(&produtos[i]);
+    }
+
+    // Ordenando os produtos em ordem alfabética de nome
+    qsort(produtos, NUM_PRODUTOS, sizeof(PROD), compararProdutos);
+
+    // Inflacionando o preço dos produtos com valor menor que 100
+    for (int i = 0; i < NUM_PRODUTOS; i++) {
+        inflacionarPreco(&produtos[i]);
+    }
+
+    // Imprimindo a lista de produtos após ordenação e inflacionamento de preços
+    imprimirProdutos(produtos, NUM_PRODUTOS);
+
+    return 0;
+}
