@@ -1,0 +1,168 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+
+typedef struct No {
+    char* dado;             // Ponteiro para a string armazenada
+    struct No* proximo;     // Ponteiro para o próximo nó
+} No;
+
+typedef struct {
+    No* cabeca;            // Ponteiro para o primeiro nó
+    int tamanho;           // Quantidade de itens na lista
+    int capacidade_memoria; // Total de memória alocada para a lista (em bytes)
+} ListaEncadeada;
+
+// Função que cria um nó e insere uma string na lista
+No* criarNo(const char* str) {
+    No* novoNo = (No*)malloc(sizeof(No));
+    if (novoNo == NULL) {
+        printf("Erro ao alocar memória para o nó.\n");
+        exit(1);  // Finaliza o programa em caso de erro de alocação
+    }
+    
+    novoNo->dado = (char*)malloc(strlen(str) + 1);  // +1 para o caractere '\0'
+    if (novoNo->dado == NULL) {
+        printf("Erro ao alocar memória para a string.\n");
+        free(novoNo);
+        exit(1);
+    }
+
+    strcpy(novoNo->dado, str); // Copia a string para o novo nó
+    novoNo->proximo = NULL;     // Inicializa o próximo nó como NULL
+    return novoNo;
+}
+
+// Função para inserir uma string no final da lista
+void inserirFim(ListaEncadeada* lista, const char* str) {
+    No* novoNo = criarNo(str);
+    if (lista->cabeca == NULL) {
+        lista->cabeca = novoNo; // Se a lista estiver vazia, o novo nó é o primeiro
+    } else {
+        No* temp = lista->cabeca;
+        while (temp->proximo != NULL) {
+            temp = temp->proximo;
+        }
+        temp->proximo = novoNo; // Inserir no final
+    }
+
+    lista->tamanho++;
+    lista->capacidade_memoria += sizeof(No) + strlen(str) + 1; // Aumenta a memória utilizada
+}
+
+// Função para remover a primeira ocorrência de uma string da lista
+void remover(ListaEncadeada* lista, const char* str) {
+    if (lista->cabeca == NULL) {
+        printf("Lista vazia!\n");
+        return;
+    }
+
+    No* temp = lista->cabeca;
+    No* anterior = NULL;
+    
+    // Busca pela string
+    while (temp != NULL && strcmp(temp->dado, str) != 0) {
+        anterior = temp;
+        temp = temp->proximo;
+    }
+
+    if (temp == NULL) {
+        printf("String não encontrada!\n");
+        return;
+    }
+
+    // Se for o primeiro nó
+    if (anterior == NULL) {
+        lista->cabeca = temp->proximo;
+    } else {
+        anterior->proximo = temp->proximo;
+    }
+
+    lista->capacidade_memoria -= sizeof(No) + strlen(temp->dado) + 1;
+    free(temp->dado); // Libera a memória da string
+    free(temp); // Libera o nó
+    lista->tamanho--;
+}
+
+// Função para buscar uma string na lista
+int buscar(ListaEncadeada* lista, const char* str) {
+    No* temp = lista->cabeca;
+    while (temp != NULL) {
+        if (strcmp(temp->dado, str) == 0) {
+            return 1; // Encontrou
+        }
+        temp = temp->proximo;
+    }
+    return 0; // Não encontrado
+}
+
+// Função para detectar o fim da lista (não precisa, pois se o próximo for NULL, sabemos que é o fim)
+int fimLista(No* no) {
+    return no == NULL;
+}
+
+// Função para retornar o tamanho da lista
+int tamanho(ListaEncadeada* lista) {
+    return lista->tamanho;
+}
+
+// Função para calcular a perda de memória (memória total alocada - memória dos itens não vazios)
+int perdaMemoria(ListaEncadeada* lista) {
+    return lista->capacidade_memoria;
+}
+
+// Função para imprimir todos os elementos da lista
+void imprimirLista(ListaEncadeada* lista) {
+    if (lista->cabeca == NULL) {
+        printf("Lista vazia!\n");
+        return;
+    }
+    
+    No* temp = lista->cabeca;
+    while (temp != NULL) {
+        printf("%s\n", temp->dado);
+        temp = temp->proximo;
+    }
+}
+
+// Função para liberar a memória de toda a lista
+void liberarLista(ListaEncadeada* lista) {
+    No* temp = lista->cabeca;
+    while (temp != NULL) {
+        No* aux = temp;
+        temp = temp->proximo;
+        free(aux->dado); // Libera a string
+        free(aux);       // Libera o nó
+    }
+    lista->cabeca = NULL;
+    lista->tamanho = 0;
+    lista->capacidade_memoria = 0;
+}
+
+int main() {
+    ListaEncadeada lista = {NULL, 0, 0};
+
+    inserirFim(&lista, "Produto 1");
+    inserirFim(&lista, "Produto 2");
+    inserirFim(&lista, "Produto 3");
+
+    printf("Lista após inserções:\n");
+    imprimirLista(&lista);
+    printf("Tamanho da lista: %d\n", tamanho(&lista));
+    printf("Memória total alocada (bytes): %d\n", perdaMemoria(&lista));
+
+    remover(&lista, "Produto 2");
+    printf("\nLista após remoção de 'Produto 2':\n");
+    imprimirLista(&lista);
+    printf("Tamanho da lista: %d\n", tamanho(&lista));
+    printf("Memória total alocada (bytes): %d\n", perdaMemoria(&lista));
+
+    if (buscar(&lista, "Produto 1")) {
+        printf("\n'Produto 1' encontrado na lista!\n");
+    } else {
+        printf("\n'Produto 1' não encontrado na lista!\n");
+    }
+
+    liberarLista(&lista);
+    return 0;
+}
