@@ -1,0 +1,60 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <conio.h>
+#include <string.h>
+
+typedef struct Celula {
+    int valor;
+    struct Celula* proximo;
+} Celula;
+
+Celula* ponto_medio(Celula* cabeca) {
+    Celula* lento = cabeca;
+    Celula* rapido = cabeca;
+
+    while (rapido != NULL && rapido->proximo != NULL) {
+        lento = lento->proximo;
+        rapido = rapido->proximo->proximo;
+    }
+
+    return lento;
+}
+
+void adicionar(Celula** cabeca, int valor) {
+    Celula* novaCelula = (Celula*)malloc(sizeof(Celula));
+    novaCelula->valor = valor;
+    novaCelula->proximo = *cabeca;
+    *cabeca = novaCelula;
+}
+
+void imprimir_lista(Celula* cabeca) {
+    Celula* temp = cabeca;
+    while (temp != NULL) {
+        printf("%d -> ", temp->valor);
+        temp = temp->proximo;
+    }
+    printf("NULL\n");
+}
+
+int main() {
+    Celula* lista = NULL;
+
+    adicionar(&lista, 10);
+    adicionar(&lista, 20);
+    adicionar(&lista, 30);
+    adicionar(&lista, 40);
+    adicionar(&lista, 50);
+
+    printf("Lista: ");
+    imprimir_lista(lista);
+
+    Celula* medio = ponto_medio(lista);
+
+    if (medio != NULL) {
+        printf("Ponto médio: %d\n", medio->valor);
+    } else {
+        printf("Lista vazia.\n");
+    }
+
+    return 0;
+}
