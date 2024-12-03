@@ -1,0 +1,76 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <conio.h>
+#include <string.h>
+
+typedef struct Lista {
+	
+    int valor;
+    struct Lista* proximo;
+    
+} Lista;
+
+int busca_iterativa(Lista* lista, int valor) {
+    Lista* atual = lista;
+    
+    while (atual != NULL) {
+        if (atual->valor == valor) {
+            return 1;  
+        }
+    
+        if (atual->valor > valor) {
+            return 0;  
+        }
+        
+        atual = atual->proximo;  
+    }
+    
+    return 0;  
+}
+
+Lista* criar_novo_no(int valor) {
+    Lista* novo = (Lista*)malloc(sizeof(Lista));
+    if (novo == NULL) {
+        printf("Erro ao alocar memória.\n");
+        exit(1);
+    }
+    novo->valor = valor;
+    novo->proximo = NULL;
+    return novo;
+}
+
+void inserir_em_ordem(Lista** lista, int valor) {
+    Lista* novo = criar_novo_no(valor);
+    
+    if (*lista == NULL || (*lista)->valor >= valor) {
+        novo->proximo = *lista;
+        *lista = novo;
+    } else {
+        Lista* atual = *lista;
+        while (atual->proximo != NULL && atual->proximo->valor < valor) {
+            atual = atual->proximo;
+        }
+        novo->proximo = atual->proximo;
+        atual->proximo = novo;
+    }
+}
+
+int main() {
+    Lista* lista = NULL;
+
+    // Inserir valores na lista (crescente)
+    inserir_em_ordem(&lista, 10);
+    inserir_em_ordem(&lista, 5);
+    inserir_em_ordem(&lista, 15);
+    inserir_em_ordem(&lista, 7);
+
+    // Testar busca iterativa
+    int valor = 7;
+    if (busca_iterativa(lista, valor)) {
+        printf("Valor %d encontrado (iterativo).\n", valor);
+    } else {
+        printf("Valor %d não encontrado (iterativo).\n", valor);
+    }
+
+    return 0;
+}
