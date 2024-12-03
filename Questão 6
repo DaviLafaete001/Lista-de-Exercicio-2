@@ -1,0 +1,87 @@
+#include <stdio.h>
+#include <stdlib.h>
+
+// Definição da estrutura do nó da lista encadeada
+typedef struct No {
+    int valor;
+    struct No* proximo;
+} No;
+
+// Função que verifica se a lista encadeada está em ordem crescente
+int estaEmOrdemCrescente(No* cabeca) {
+    // Se a lista estiver vazia ou tiver apenas um elemento, está em ordem crescente
+    if (cabeca == NULL || cabeca->proximo == NULL) {
+        return 1;  // A lista está em ordem crescente
+    }
+
+    No* atual = cabeca;
+    while (atual->proximo != NULL) {
+        // Se o valor do nó atual for maior ou igual ao valor do próximo nó, a lista não está em ordem crescente
+        if (atual->valor >= atual->proximo->valor) {
+            return 0;  // A lista não está em ordem crescente
+        }
+        atual = atual->proximo;
+    }
+
+    // Se não encontramos nenhum par de elementos fora de ordem, a lista está em ordem crescente
+    return 1;
+}
+
+// Função para criar um novo nó com valor
+No* criarNo(int valor) {
+    No* novoNo = (No*)malloc(sizeof(No));
+    if (!novoNo) {
+        printf("Erro ao alocar memória!\n");
+        exit(1);
+    }
+    novoNo->valor = valor;
+    novoNo->proximo = NULL;
+    return novoNo;
+}
+
+// Função para inserir um novo nó no final da lista
+void inserirNo(No** cabeca, int valor) {
+    No* novoNo = criarNo(valor);
+    if (*cabeca == NULL) {
+        *cabeca = novoNo;
+    } else {
+        No* temp = *cabeca;
+        while (temp->proximo != NULL) {
+            temp = temp->proximo;
+        }
+        temp->proximo = novoNo;
+    }
+}
+
+// Função para imprimir a lista encadeada
+void imprimirLista(No* cabeca) {
+    No* temp = cabeca;
+    while (temp != NULL) {
+        printf("%d ", temp->valor);
+        temp = temp->proximo;
+    }
+    printf("\n");
+}
+
+int main() {
+    No* lista = NULL;
+
+    // Inserindo alguns valores na lista
+    inserirNo(&lista, 1);
+    inserirNo(&lista, 3);
+    inserirNo(&lista, 5);
+    inserirNo(&lista, 7);
+
+    // Imprimindo a lista
+    printf("Lista: ");
+    imprimirLista(lista);
+
+    // Verificando se a lista está em ordem crescente
+    if (estaEmOrdemCrescente(lista)) {
+        printf("A lista está em ordem crescente.\n");
+    } else {
+        printf("A lista NÃO está em ordem crescente.\n");
+    }
+
+    return 0;
+}
