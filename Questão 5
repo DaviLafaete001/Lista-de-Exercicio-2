@@ -1,0 +1,266 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+
+#define MAX_TAM_NOME 100
+#define MAX_TAM_TELEFONE 15
+#define MAX_TAM_EMAIL 100
+
+// Estrutura para armazenar os dados de um contato
+typedef struct Contato {
+    char nome[MAX_TAM_NOME];
+    char telefone[MAX_TAM_TELEFONE];
+    char email[MAX_TAM_EMAIL];
+} Contato;
+
+// Estrutura para representar um nó na lista encadeada
+typedef struct No {
+    Contato contato;
+    struct No* proximo;
+} No;
+
+// Estrutura que representa a agenda de contatos (lista encadeada)
+typedef struct Agenda {
+    No* cabeca;
+    int tamanho;
+} Agenda;
+
+// Função para criar um novo contato
+Contato criarContato(const char* nome, const char* telefone, const char* email) {
+    Contato c;
+    strncpy(c.nome, nome, MAX_TAM_NOME);
+    strncpy(c.telefone, telefone, MAX_TAM_TELEFONE);
+    strncpy(c.email, email, MAX_TAM_EMAIL);
+    return c;
+}
+
+// Função para criar um novo nó para a lista encadeada
+No* criarNo(Contato c) {
+    No* novoNo = (No*)malloc(sizeof(No));
+    if (!novoNo) {
+        printf("Erro ao alocar memória para o nó.\n");
+        exit(1);
+    }
+    novoNo->contato = c;
+    novoNo->proximo = NULL;
+    return novoNo;
+}
+
+// Função para inicializar a agenda de contatos
+void inicializarAgenda(Agenda* agenda) {
+    agenda->cabeca = NULL;
+    agenda->tamanho = 0;
+}
+
+// Função para inserir um novo contato no final da agenda
+void inserirContato(Agenda* agenda, Contato c) {
+    No* novoNo = criarNo(c);
+    if (agenda->cabeca == NULL) {
+        agenda->cabeca = novoNo;
+    } else {
+        No* temp = agenda->cabeca;
+        while (temp->proximo != NULL) {
+            temp = temp->proximo;
+        }
+        temp->proximo = novoNo;
+    }
+    agenda->tamanho++;
+}
+
+// Função para buscar um contato por nome
+No* buscarContato(Agenda* agenda, const char* nome) {
+    No* temp = agenda->cabeca;
+    while (temp != NULL) {
+        if (strcmp(temp->contato.nome, nome) == 0) {
+            return temp;
+        }
+        temp = temp->proximo;
+    }
+    return NULL;  // Retorna NULL se não encontrar
+}
+
+// Função para remover um contato por nome
+void removerContato(Agenda* agenda, const char* nome) {
+    No* temp = agenda->cabeca;
+    No* anterior = NULL;
+
+    while (temp != NULL && strcmp(temp->contato.nome, nome) != 0) {
+        anterior = temp;
+        temp = temp->proximo;
+    }
+
+    if (temp == NULL) {
+        printf("Contato não encontrado!\n");
+        return;
+    }
+
+    if (anterior == NULL) {
+        agenda->cabeca = temp->proximo;  // Remove o primeiro nó
+    } else {
+        anterior->proximo = temp->proximo;  // Remove o nó intermediário
+    }
+
+    free(temp);
+    agenda->tamanho--;
+}
+
+// Função para atualizar o nome de um contato
+void atualizarNome(Agenda* agenda, const char* nomeAntigo, const char* novoNome) {
+    No* contato = buscarContato(agenda, nomeAntigo);
+    if (contato) {
+        strncpy(contato->contato.nome, novoNome, MAX_TAM_NOME);
+    } else {
+        printf("Contato não encontrado para atualizar nome.\n");
+    }
+}
+
+// Função para atualizar o telefone de um contato
+void atualizarTelefone(Agenda* agenda, const char* nome, const char* novoTelefone) {
+    No* contato = buscarContato(agenda, nome);
+    if (contato) {
+        strncpy(contato->contato.telefone, novoTelefone, MAX_TAM_TELEFONE);
+    } else {
+        printf("Contato não encontrado para atualizar telefone.\n");
+    }
+}
+
+// Função para atualizar o e-mail de um contato
+void atualizarEmail(Agenda* agenda, const char* nome, const char* novoEmail) {
+    No* contato = buscarContato(agenda, nome);
+    if (contato) {
+        strncpy(contato->contato.email, novoEmail, MAX_TAM_EMAIL);
+    } else {
+        printf("Contato não encontrado para atualizar e-mail.\n");
+    }
+}
+
+// Função para imprimir todos os contatos da agenda
+void imprimirAgenda(Agenda* agenda) {
+    No* temp = agenda->cabeca;
+    if (temp == NULL) {
+        printf("A agenda está vazia.\n");
+        return;
+    }
+    
+    printf("\nLista de Contatos:\n");
+    while (temp != NULL) {
+        printf("Nome: %s\n", temp->contato.nome);
+        printf("Telefone: %s\n", temp->contato.telefone);
+        printf("Email: %s\n", temp->contato.email);
+        printf("-------------------------\n");
+        temp = temp->proximo;
+    }
+}
+
+// Função para detectar o fim da lista
+int fimDeLista(No* no) {
+    return (no == NULL);
+}
+
+int main() {
+    Agenda agenda;
+    inicializarAgenda(&agenda);
+
+    int opcao;
+    char nome[MAX_TAM_NOME], telefone[MAX_TAM_TELEFONE], email[MAX_TAM_EMAIL];
+
+    do {
+        printf("\n--- Menu de Gestão de Contatos ---\n");
+        printf("1. Inserir Contato\n");
+        printf("2. Remover Contato\n");
+        printf("3. Buscar Contato\n");
+        printf("4. Atualizar Nome\n");
+        printf("5. Atualizar Telefone\n");
+        printf("6. Atualizar E-mail\n");
+        printf("7. Imprimir Agenda\n");
+        printf("0. Sair\n");
+        printf("Escolha uma opção: ");
+        scanf("%d", &opcao);
+        getchar();  // Limpar o buffer de entrada
+
+        switch (opcao) {
+            case 1:
+                printf("\nInserir Contato\n");
+                printf("Digite o nome: ");
+                fgets(nome, sizeof(nome), stdin);
+                nome[strcspn(nome, "\n")] = '\0';
+                printf("Digite o telefone: ");
+                fgets(telefone, sizeof(telefone), stdin);
+                telefone[strcspn(telefone, "\n")] = '\0';
+                printf("Digite o e-mail: ");
+                fgets(email, sizeof(email), stdin);
+                email[strcspn(email, "\n")] = '\0';
+                inserirContato(&agenda, criarContato(nome, telefone, email));
+                break;
+
+            case 2:
+                printf("\nRemover Contato\n");
+                printf("Digite o nome do contato a ser removido: ");
+                fgets(nome, sizeof(nome), stdin);
+                nome[strcspn(nome, "\n")] = '\0';
+                removerContato(&agenda, nome);
+                break;
+
+            case 3:
+                printf("\nBuscar Contato\n");
+                printf("Digite o nome do contato: ");
+                fgets(nome, sizeof(nome), stdin);
+                nome[strcspn(nome, "\n")] = '\0';
+                No* contato = buscarContato(&agenda, nome);
+                if (contato) {
+                    printf("Nome: %s\n", contato->contato.nome);
+                    printf("Telefone: %s\n", contato->contato.telefone);
+                    printf("Email: %s\n", contato->contato.email);
+                } else {
+                    printf("Contato não encontrado.\n");
+                }
+                break;
+
+            case 4:
+                printf("\nAtualizar Nome\n");
+                printf("Digite o nome antigo: ");
+                fgets(nome, sizeof(nome), stdin);
+                nome[strcspn(nome, "\n")] = '\0';
+                printf("Digite o novo nome: ");
+                fgets(nome, sizeof(nome), stdin);
+                nome[strcspn(nome, "\n")] = '\0';
+                atualizarNome(&agenda, nome, nome);
+                break;
+
+            case 5:
+                printf("\nAtualizar Telefone\n");
+                printf("Digite o nome do contato: ");
+                fgets(nome, sizeof(nome), stdin);
+                nome[strcspn(nome, "\n")] = '\0';
+                printf("Digite o novo telefone: ");
+                fgets(telefone, sizeof(telefone), stdin);
+                telefone[strcspn(telefone, "\n")] = '\0';
+                atualizarTelefone(&agenda, nome, telefone);
+                break;
+
+            case 6:
+                printf("\nAtualizar E-mail\n");
+                printf("Digite o nome do contato: ");
+                fgets(nome, sizeof(nome), stdin);
+                nome[strcspn(nome, "\n")] = '\0';
+                printf("Digite o novo e-mail: ");
+                fgets(email, sizeof(email), stdin);
+                email[strcspn(email, "\n")] = '\0';
+                atualizarEmail(&agenda, nome, email);
+                break;
+
+            case 7:
+                imprimirAgenda(&agenda);
+                break;
+
+            case 0:
+                printf("Saindo...\n");
+                break;
+
+            default:
+                printf("Opção inválida. Tente novamente.\n");
+        }
+    } while (opcao != 0);
+
+    return 0;
+}
