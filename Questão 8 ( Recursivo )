@@ -1,0 +1,44 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <conio.h>
+#include <string.h>
+
+
+#define LINHAS 3
+#define COLUNAS 3
+
+int encontrarMinimoRecursivoAux(int matriz[LINHAS][COLUNAS], int i, int j, int minimo) {
+    if (i >= LINHAS) {
+        return minimo;
+    }
+
+    if (j >= COLUNAS) {
+        return encontrarMinimoRecursivoAux(matriz, i + 1, 0, minimo);
+    }
+
+    // Atualiza o mínimo se o valor atual for menor
+    if (matriz[i][j] < minimo) {
+        minimo = matriz[i][j];
+    }
+
+    // Chama recursivamente para o próximo elemento
+    return encontrarMinimoRecursivoAux(matriz, i, j + 1, minimo);
+}
+
+// Função para iniciar a busca recursiva
+int encontrarMinimoRecursivo(int matriz[LINHAS][COLUNAS]) {
+    return encontrarMinimoRecursivoAux(matriz, 0, 0, matriz[0][0]);
+}
+
+int main() {
+    int matriz[LINHAS][COLUNAS] = {
+        {3, 5, 2},
+        {7, 1, 8},
+        {4, 6, 9}
+    };
+
+    int minimo = encontrarMinimoRecursivo(matriz);
+    printf("O valor minimo encontrado de forma recursiva e: %d\n", minimo);
+
+    return 0;
+}
