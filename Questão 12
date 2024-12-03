@@ -1,0 +1,70 @@
+#include <stdio.h>
+#include <stdlib.h>
+
+// Definição da estrutura do nó da árvore binária
+struct No {
+    int valor;
+    struct No* esquerda;
+    struct No* direita;
+};
+
+// Função para criar um novo nó
+struct No* criar_no(int valor) {
+    struct No* novo_no = (struct No*)malloc(sizeof(struct No));
+    novo_no->valor = valor;
+    novo_no->esquerda = NULL;
+    novo_no->direita = NULL;
+    return novo_no;
+}
+
+// Função para obter o espelho da árvore binária
+void espelho(struct No* raiz) {
+    if (raiz == NULL) {
+        return;
+    }
+
+    // Troca as subárvores esquerda e direita
+    struct No* temp = raiz->esquerda;
+    raiz->esquerda = raiz->direita;
+    raiz->direita = temp;
+
+    // Chama recursivamente para as subárvores
+    espelho(raiz->esquerda);
+    espelho(raiz->direita);
+}
+
+// Função para imprimir a árvore em ordem (in-order) para verificar a estrutura
+void imprimir_em_ordem(struct No* raiz) {
+    if (raiz != NULL) {
+        imprimir_em_ordem(raiz->esquerda);
+        printf("%d ", raiz->valor);
+        imprimir_em_ordem(raiz->direita);
+    }
+}
+
+// Função principal para testar o código
+int main() {
+    // Criando a árvore binária
+    struct No* raiz = criar_no(1);
+    raiz->esquerda = criar_no(2);
+    raiz->direita = criar_no(3);
+    raiz->esquerda->esquerda = criar_no(4);
+    raiz->esquerda->direita = criar_no(5);
+    raiz->direita->esquerda = criar_no(6);
+    raiz->direita->direita = criar_no(7);
+
+    // Imprimindo a árvore original
+    printf("Árvore original em ordem: ");
+    imprimir_em_ordem(raiz);
+    printf("\n");
+
+    // Obtendo o espelho da árvore
+    espelho(raiz);
+
+    // Imprimindo a árvore espelhada
+    printf("Árvore espelhada em ordem: ");
+    imprimir_em_ordem(raiz);
+    printf("\n");
+
+    return 0;
+}
