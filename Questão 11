@@ -1,0 +1,156 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <ctype.h>
+
+#define MAX_PALAVRA 100
+
+typedef struct Nodo {
+    char palavra[MAX_PALAVRA];
+    int frequencia;
+    struct Nodo* proximo;
+} Nodo;
+
+Nodo* criarNodo(const char* palavra) {
+    Nodo* novoNodo = (Nodo*) malloc(sizeof(Nodo));
+    if (novoNodo) {
+        strcpy(novoNodo->palavra, palavra);
+        novoNodo->frequencia = 1;
+        novoNodo->proximo = NULL;
+    }
+    return novoNodo;
+}
+
+void inserirPalavra(Nodo** cabeca, const char* palavra) {
+    Nodo* atual = *cabeca;
+    Nodo* anterior = NULL;
+
+    while (atual != NULL && strcmp(atual->palavra, palavra) != 0) {
+        anterior = atual;
+        atual = atual->proximo;
+    }
+
+    if (atual != NULL) {
+        atual->frequencia++;
+    } else {
+        Nodo* novoNodo = criarNodo(palavra);
+        if (anterior == NULL) {
+            *cabeca = novoNodo;
+        } else {
+            anterior->proximo = novoNodo;
+        }
+    }
+}
+
+int contarPalavras(Nodo* cabeca) {
+    int contador = 0;
+    Nodo* atual = cabeca;
+    while (atual != NULL) {
+        contador++;
+        atual = atual->proximo;
+    }
+    return contador;
+}
+
+int contarPalavrasDistintas(Nodo* cabeca) {
+    return contarPalavras(cabeca);
+}
+
+double mediaLetras(Nodo* cabeca) {
+    int totalLetras = 0;
+    int totalPalavras = 0;
+    Nodo* atual = cabeca;
+    while (atual != NULL) {
+        totalLetras += strlen(atual->palavra);
+        totalPalavras++;
+        atual = atual->proximo;
+    }
+    return totalPalavras > 0 ? (double)totalLetras / totalPalavras : 0.0;
+}
+
+const char* maiorPalavra(Nodo* cabeca) {
+    Nodo* atual = cabeca;
+    const char* maior = NULL;
+    while (atual != NULL) {
+        if (maior == NULL || strlen(atual->palavra) > strlen(maior)) {
+            maior = atual->palavra;
+        }
+        atual = atual->proximo;
+    }
+    return maior;
+}
+
+const char* menorPalavra(Nodo* cabeca) {
+    Nodo* atual = cabeca;
+    const char* menor = NULL;
+    while (atual != NULL) {
+        if (menor == NULL || strlen(atual->palavra) < strlen(menor)) {
+            menor = atual->palavra;
+        }
+        atual = atual->proximo;
+    }
+    return menor;
+}
+
+const char* palavraMaisFrequente(Nodo* cabeca) {
+    Nodo* atual = cabeca;
+    Nodo* maisFrequente = NULL;
+    while (atual != NULL) {
+        if (maisFrequente == NULL || atual->frequencia > maisFrequente->frequencia) {
+            maisFrequente = atual;
+        }
+        atual = atual->proximo;
+    }
+    return maisFrequente != NULL ? maisFrequente->palavra : NULL;
+}
+
+const char* palavraMaisRara(Nodo* cabeca) {
+    Nodo* atual = cabeca;
+    Nodo* maisRara = NULL;
+    while (atual != NULL) {
+        if (maisRara == NULL || atual->frequencia < maisRara->frequencia) {
+            maisRara = atual;
+        }
+        atual = atual->proximo;
+    }
+    return maisRara != NULL ? maisRara->palavra : NULL;
+}
+
+void processarTexto(Nodo** cabeca, const char* texto) {
+    char palavra[MAX_PALAVRA];
+    int i = 0;
+
+    for (int j = 0; texto[j] != '\0'; j++) {
+        if (isalpha(texto[j])) {
+            palavra[i++] = tolower(texto[j]);
+        } else if (i > 0) {
+            palavra[i] = '\0';
+            inserirPalavra(cabeca, palavra);
+            i = 0;
+        }
+    }
+    if (i > 0) {
+        palavra[i] = '\0';
+        inserirPalavra(cabeca, palavra);
+    }
+}
+
+int main() {
+    char texto[1000];
+    Nodo* cabeca = NULL;
+
+    printf("Digite um texto (máximo 1000 caracteres):\n");
+    fgets(texto, sizeof(texto), stdin);
+
+    processarTexto(&cabeca, texto);
+
+    printf("Número total de palavras: %d\n", contarPalavras(cabeca));
+    printf("Número de palavras distintas: %d\n", contarPalavrasDistintas(cabeca));
+    printf("Média de letras das palavras: %.2f\n", mediaLetras(cabeca));
+    printf("Maior palavra: %s\n", maiorPalavra(cabeca));
+    printf("Menor palavra: %s\n", menorPalavra(cabeca));
+    printf("Palavra mais frequente: %s\n", palavraMaisFrequente(cabeca));
+    printf("Palavra mais rara: %s\n", palavraMaisRara(cabeca));
+
+    return 0;
+}
